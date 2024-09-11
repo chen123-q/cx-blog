@@ -1,0 +1,359 @@
+diff --git a/src/components/BlogAlert.vue b/src/components/BlogAlert.vue
+index 14b889a7e168e20a0d8627c415aa0e6d89115256..fdcc04783d43f015ab2b7275c0ce8d453eeca576 100644
+--- a/src/components/BlogAlert.vue
++++ b/src/components/BlogAlert.vue
+@@ -1,46 +1,54 @@
+ <script lang="ts" setup>
+-import { ElAlert } from 'element-plus'
+-import { onMounted, ref } from 'vue'
+-import { useBlogConfig } from '../composables/config/blog'
++import { ElAlert } from "element-plus";
++import { onMounted, ref } from "vue";
++import { useBlogConfig } from "../composables/config/blog";
++import { getTime } from "../utils/client";
++const { alert: alertProps } = useBlogConfig();
+ 
+-const { alert: alertProps } = useBlogConfig()
+-const show = ref(false)
+-const storageKey = 'theme-blog-alert'
+-const closeFlag = `${storageKey}-close`
++const date = getTime();
++console.log(date);
++
++const show = ref(false);
++const storageKey = "theme-blog-alert";
++const closeFlag = `${storageKey}-close`;
+ onMounted(() => {
+   // 取旧值
+-  const oldValue = localStorage.getItem(storageKey)
+-  const newValue = JSON.stringify(alertProps)
+-  localStorage.setItem(storageKey, newValue)
++  const oldValue = localStorage.getItem(storageKey);
++  const newValue = JSON.stringify(alertProps);
++  localStorage.setItem(storageKey, newValue);
+ 
+   // >= 0 每次都展示，区别是否自动消失
+   if (Number(alertProps?.duration) >= 0) {
+-    show.value = true
++    show.value = true;
+     if (alertProps?.duration) {
+       setTimeout(() => {
+-        show.value = false
+-      }, alertProps?.duration)
++        show.value = false;
++      }, alertProps?.duration);
+     }
+-    return
++    return;
+   }
+ 
+   if (oldValue !== newValue && alertProps?.duration === -1) {
+     // 当做新值处理
+-    show.value = true
+-    localStorage.removeItem(closeFlag)
+-    return
++    show.value = true;
++    localStorage.removeItem(closeFlag);
++    return;
+   }
+ 
+   // 新旧相等，判断是否点击过close，没点击关闭依然展示
+-  if (oldValue === newValue && alertProps?.duration === -1 && !localStorage.getItem(closeFlag)) {
+-    show.value = true
++  if (
++    oldValue === newValue &&
++    alertProps?.duration === -1 &&
++    !localStorage.getItem(closeFlag)
++  ) {
++    show.value = true;
+   }
+-})
++});
+ 
+ function handleClose() {
+-  show.value = false
++  show.value = false;
+   if (alertProps?.duration === -1) {
+-    localStorage.setItem(closeFlag, `${+new Date()}`)
++    localStorage.setItem(closeFlag, `${+new Date()}`);
+   }
+ }
+ </script>
+@@ -48,7 +56,7 @@ function handleClose() {
+ <template>
+   <div v-if="show" class="global-alert" data-pagefind-ignore="all">
+     <ElAlert
+-      :title="alertProps?.title"
++      :title="date + alertProps?.title"
+       :type="alertProps?.type"
+       :show-icon="alertProps?.showIcon"
+       :center="alertProps?.center"
+diff --git a/src/utils/client/index.ts b/src/utils/client/index.ts
+index 8ec3703d676951d1dc5546eec45ce404e8a36300..0a8b10eaf4da7a1fdfa424c2de9284937f69cfcc 100644
+--- a/src/utils/client/index.ts
++++ b/src/utils/client/index.ts
+@@ -1,31 +1,31 @@
+-import type { ThemeableImage } from '../../composables/config'
++import type { ThemeableImage } from "../../composables/config";
+ 
+ export function shuffleArray(arr: any[]) {
+-  const array = [...arr]
++  const array = [...arr];
+   for (let i = array.length - 1; i > 0; i--) {
+     const j = Math.floor(Math.random() * (i + 1));
+-    [array[i], array[j]] = [array[j], array[i]]
++    [array[i], array[j]] = [array[j], array[i]];
+   }
+-  return array
++  return array;
+ }
+-export function formatDate(d: any, fmt = 'yyyy-MM-dd hh:mm:ss') {
++export function formatDate(d: any, fmt = "yyyy-MM-dd hh:mm:ss") {
+   if (!(d instanceof Date)) {
+-    d = new Date(d)
++    d = new Date(d);
+   }
+   const o: any = {
+-    'M+': d.getMonth() + 1, // 月份
+-    'd+': d.getDate(), // 日
+-    'h+': d.getHours(), // 小时
+-    'm+': d.getMinutes(), // 分
+-    's+': d.getSeconds(), // 秒
+-    'q+': Math.floor((d.getMonth() + 3) / 3), // 季度
+-    'S': d.getMilliseconds() // 毫秒
+-  }
++    "M+": d.getMonth() + 1, // 月份
++    "d+": d.getDate(), // 日
++    "h+": d.getHours(), // 小时
++    "m+": d.getMinutes(), // 分
++    "s+": d.getSeconds(), // 秒
++    "q+": Math.floor((d.getMonth() + 3) / 3), // 季度
++    S: d.getMilliseconds(), // 毫秒
++  };
+   if (/(y+)/.test(fmt)) {
+     fmt = fmt.replace(
+       RegExp.$1,
+       `${d.getFullYear()}`.substr(4 - RegExp.$1.length)
+-    )
++    );
+   }
+   // eslint-disable-next-line no-restricted-syntax
+   for (const k in o) {
+@@ -33,72 +33,72 @@ export function formatDate(d: any, fmt = 'yyyy-MM-dd hh:mm:ss') {
+       fmt = fmt.replace(
+         RegExp.$1,
+         RegExp.$1.length === 1 ? o[k] : `00${o[k]}`.substr(`${o[k]}`.length)
+-      )
++      );
+   }
+-  return fmt
++  return fmt;
+ }
+ 
+ export function isCurrentWeek(date: Date, target?: Date) {
+-  const now = target || new Date()
+-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+-  const oneDay = 1000 * 60 * 60 * 24
+-  const nowWeek = today.getDay()
++  const now = target || new Date();
++  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
++  const oneDay = 1000 * 60 * 60 * 24;
++  const nowWeek = today.getDay();
+   // 本周一的时间
+-  const startWeek = today.getTime() - (nowWeek === 0 ? 6 : nowWeek - 1) * oneDay
+-  return +date >= startWeek && +date <= startWeek + 7 * oneDay
++  const startWeek =
++    today.getTime() - (nowWeek === 0 ? 6 : nowWeek - 1) * oneDay;
++  return +date >= startWeek && +date <= startWeek + 7 * oneDay;
+ }
+ 
+ export function formatShowDate(date: Date | string) {
+-  const source = date ? +new Date(date) : +new Date()
+-  const now = +new Date()
+-  const diff = now - source
+-  const oneSeconds = 1000
+-  const oneMinute = oneSeconds * 60
+-  const oneHour = oneMinute * 60
+-  const oneDay = oneHour * 24
+-  const oneWeek = oneDay * 7
++  const source = date ? +new Date(date) : +new Date();
++  const now = +new Date();
++  const diff = now - source;
++  const oneSeconds = 1000;
++  const oneMinute = oneSeconds * 60;
++  const oneHour = oneMinute * 60;
++  const oneDay = oneHour * 24;
++  const oneWeek = oneDay * 7;
+   if (diff < oneMinute) {
+-    return `${Math.floor(diff / oneSeconds)}秒前`
++    return `${Math.floor(diff / oneSeconds)}秒前`;
+   }
+   if (diff < oneHour) {
+-    return `${Math.floor(diff / oneMinute)}分钟前`
++    return `${Math.floor(diff / oneMinute)}分钟前`;
+   }
+   if (diff < oneDay) {
+-    return `${Math.floor(diff / oneHour)}小时前`
++    return `${Math.floor(diff / oneHour)}小时前`;
+   }
+   if (diff < oneWeek) {
+-    return `${Math.floor(diff / oneDay)}天前`
++    return `${Math.floor(diff / oneDay)}天前`;
+   }
+ 
+-  return formatDate(new Date(date), 'yyyy-MM-dd')
++  return formatDate(new Date(date), "yyyy-MM-dd");
+ }
+ 
+-const pattern
+-  = /[a-zA-Z0-9_\u0392-\u03C9\u00C0-\u00FF\u0600-\u06FF\u0400-\u04FF]+|[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\u3040-\u309F\uAC00-\uD7AF]+/g
++const pattern =
++  /[a-zA-Z0-9_\u0392-\u03C9\u00C0-\u00FF\u0600-\u06FF\u0400-\u04FF]+|[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\u3040-\u309F\uAC00-\uD7AF]+/g;
+ 
+ // copy from https://github.com/youngjuning/vscode-juejin-wordcount/blob/main/count-word.ts
+ export default function countWord(data: string) {
+-  const m = data.match(pattern)
+-  let count = 0
++  const m = data?.match(pattern);
++  let count = 0;
+   if (!m) {
+-    return 0
++    return 0;
+   }
+   for (let i = 0; i < m.length; i += 1) {
+-    if (m[i].charCodeAt(0) >= 0x4E00) {
+-      count += m[i].length
+-    }
+-    else {
+-      count += 1
++    if (m[i].charCodeAt(0) >= 0x4e00) {
++      count += m[i].length;
++    } else {
++      count += 1;
+     }
+   }
+-  return count
++  return count;
+ }
+ 
+ export function chineseSearchOptimize(input: string) {
+   return input
+-    .replace(/[\u4E00-\u9FA5]/g, ' $& ')
+-    .replace(/\s+/g, ' ')
+-    .trim()
++    .replace(/[\u4E00-\u9FA5]/g, " $& ")
++    .replace(/\s+/g, " ")
++    .trim();
+ }
+ 
+ /**
+@@ -108,16 +108,16 @@ export function chineseSearchOptimize(input: string) {
+  */
+ export function getGithubUpdateTime(url: string) {
+   // 提取Github url中的用户名和仓库名
+-  const match = url.match(/github.com\/(.+)/)
++  const match = url.match(/github.com\/(.+)/);
+   if (!match?.[1]) {
+-    return Promise.reject(new Error('Github地址格式错误'))
++    return Promise.reject(new Error("Github地址格式错误"));
+   }
+-  const [owner, repo] = match[1].split('/')
++  const [owner, repo] = match[1].split("/");
+   return fetch(`https://api.github.com/repos/${owner}/${repo}`)
+-    .then(res => res.json())
++    .then((res) => res.json())
+     .then((res) => {
+-      return res.updated_at
+-    })
++      return res.updated_at;
++    });
+ }
+ 
+ /**
+@@ -129,18 +129,18 @@ export function getGithubDirUpdateTime(
+   dir?: string,
+   branch?: string
+ ) {
+-  let baseUrl = `https://api.github.com/repos/${owner}/${repo}/commits`
++  let baseUrl = `https://api.github.com/repos/${owner}/${repo}/commits`;
+   if (branch) {
+-    baseUrl += `/${branch}`
++    baseUrl += `/${branch}`;
+   }
+   if (dir) {
+-    baseUrl += `?path=${dir}`
++    baseUrl += `?path=${dir}`;
+   }
+   return fetch(baseUrl)
+-    .then(res => res.json())
++    .then((res) => res.json())
+     .then((res) => {
+-      return [res].flat()[0].commit.committer.date
+-    })
++      return [res].flat()[0].commit.committer.date;
++    });
+ }
+ 
+ // 解析页面获取最后更新时间（跨域）
+@@ -158,26 +158,51 @@ export function getImageUrl(
+   image: ThemeableImage,
+   isDarkMode: boolean
+ ): string {
+-  if (typeof image === 'string') {
++  if (typeof image === "string") {
+     // 如果 ThemeableImage 类型为 string，则直接返回字符串
+-    return image
++    return image;
+   }
+-  if ('src' in image) {
++  if ("src" in image) {
+     // 如果 ThemeableImage 类型是一个对象，并且对象有 src 属性，则返回 src 属性对应的字符串
+-    return image.src
++    return image.src;
+   }
+-  if ('light' in image && 'dark' in image) {
++  if ("light" in image && "dark" in image) {
+     // 如果 ThemeableImage 类型是一个对象，并且对象同时有 light 和 dark 属性，则根据 isDarkMode 返回对应的 URL
+-    return isDarkMode ? image.dark : image.light
++    return isDarkMode ? image.dark : image.light;
+   } // 如果 ThemeableImage 类型不是上述情况，则返回空字符串
+-  return ''
++  return "";
+ }
+ 
+ export function wrapperCleanUrls(cleanUrls: boolean, route: string) {
+-  const tempUrl = route.replace(/\.html$/, '')
+-  return cleanUrls ? tempUrl : `${tempUrl}.html`
++  const tempUrl = route.replace(/\.html$/, "");
++  return cleanUrls ? tempUrl : `${tempUrl}.html`;
+ }
+ 
+ export function replaceValue(str: string, value: any) {
+-  return str.replace(/\{\{value\}\}/, value)
++  return str.replace(/\{\{value\}\}/, value);
++}
++
++//获取周几
++export function today(date = new Date()) {
++  const arr = ["日", "一", "二", "三", "四", "五", "六"];
++  return "星期" + arr[date.getDay()];
++}
++//一天时间段
++export function timeQuantum(date = new Date()) {
++  const hour = date.getHours();
++  if (hour < 5) return "凌晨好";
++  if (hour < 8) return "早上好";
++  if (hour < 11) return "上午好";
++  if (hour < 13) return "中午好";
++  if (hour < 17) return "下午好";
++  if (hour < 19) return "傍晚好";
++  if (hour <= 23) return "晚上好";
+ }
++
++export const getTime = () => {
++  const date = new Date();
++  const tips = `今天是【${formatDate(date, "yyyy-MM-dd")} / ${today(
++    date
++  )}】,${timeQuantum(date)}!`;
++  return tips;
++};
