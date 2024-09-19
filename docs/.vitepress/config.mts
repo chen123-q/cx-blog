@@ -60,10 +60,10 @@ export default defineConfig({
       ],
     }, */
     socialLinks: [
-      {
+      /* {
         icon: "github",
         link: "https://github.com/chen123-q",
-      },
+      }, */
       {
         icon: {
           svg: JueJin,
