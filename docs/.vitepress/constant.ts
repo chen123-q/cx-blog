@@ -38,7 +38,7 @@ export const navList = [
       },
     ], */
   },
-  {
+  /* {
     text: "小玩意儿",
     items: [
       {
@@ -46,7 +46,7 @@ export const navList = [
         link: "https://cx-off-duty.zeabur.app/",
       },
     ],
-  },
+  }, */
   // { text: "关于作者", link: "https://sugarat.top/aboutme.html" },
 ];
 function help(navList) {
