@@ -1,8 +1,6 @@
 ---
 description: 记录 pnpm 修改 node_modules 包代码步骤
 date: 2024-09-09
-top: 1
-sticky: 10
 tag:
   - 前端
 tags:
